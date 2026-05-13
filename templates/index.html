@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Document Explorer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+    <main class="page-wrapper">
+
+        <section class="app-card">
+
+            <header class="app-header">
+                <div class="brand">
+                    <div class="brand-icon">
+                        ✦
+                    </div>
+
+                    <div>
+                        <h1>AI Document Explorer</h1>
+                        <p>Haz preguntas sobre tus documentos PDF y obtén respuestas con fuentes verificables</p>
+                    </div>
+                </div>
+            </header>
+
+            <section class="chat-panel">
+
+                {% if not answer %}
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            📖
+                        </div>
+
+                        <h2>Escribe una pregunta para comenzar</h2>
+                        <p>Explora tus documentos PDF con el poder de la inteligencia artificial</p>
+                    </div>
+                {% endif %}
+
+                {% if error %}
+                    <div class="result-box">
+                        <span class="result-label">Error</span>
+                        <p>{{ error }}</p>
+                    </div>
+                {% endif %}
+
+                {% if answer %}
+                    <div class="result-box">
+                        <span class="result-label">Respuesta</span>
+                        <p>{{ answer }}</p>
+                    </div>
+                {% endif %}
+
+                {% if sources %}
+                    <div class="sources-box">
+                        <h3>Fuentes utilizadas</h3>
+
+                        <div class="sources-list">
+                            {% for source in sources %}
+                                <div class="source-card">
+                                    <strong>{{ source.file_name }}</strong>
+                                    <span>Página {{ source.page_number }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                <form method="POST" class="question-form" id="questionForm">
+                    <textarea
+                        name="question"
+                        placeholder="Escribe tu pregunta sobre los documentos..."
+                    >{{ question }}</textarea>
+
+                    <button type="submit" id="submitButton">
+                        <span>⌁</span>
+                        Consultar documentos
+                    </button>
+
+                    <div class="loading-box" id="loadingBox">
+                        <div class="loading-text">Consultando documentos y generando respuesta...</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                    </div>
+                </form>
+
+                <script>
+                    const questionForm = document.getElementById("questionForm");
+                    const loadingBox = document.getElementById("loadingBox");
+                    const submitButton = document.getElementById("submitButton");
+
+                    questionForm.addEventListener("submit", function () {
+                        loadingBox.classList.add("is-visible");
+                        submitButton.disabled = true;
+                        submitButton.innerHTML = "<span>⌁</span> Consultando...";
+                    });
+                </script>
+
+            </section>
+
+        </section>
+
+        <footer class="page-footer">
+            Powered by AI · Respuestas verificables con fuentes
+        </footer>
+
+        <button class="help-button" type="button">?</button>
+
+    </main>
+
+</body>
+</html>
