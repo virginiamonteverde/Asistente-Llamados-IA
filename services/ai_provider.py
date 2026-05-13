@@ -35,3 +35,24 @@ class OllamaProvider:
         data = response.json()
 
         return data["embedding"]
+
+    def generate_answer(self, prompt: str) -> str:
+        """
+        Genera una respuesta usando el modelo de chat de Ollama.
+        """
+
+        response = requests.post(
+            f"{self.base_url}/api/generate",
+            json={
+                "model": self.chat_model,
+                "prompt": prompt,
+                "stream": False,
+            },
+            timeout=300,
+        )
+
+        response.raise_for_status()
+
+        data = response.json()
+
+        return data["response"]

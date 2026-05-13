@@ -1,7 +1,7 @@
 def split_pages_into_chunks(
     pages: list[dict],
-    chunk_size: int = 1000,
-    chunk_overlap: int = 200,
+    chunk_size: int = 1800,
+    chunk_overlap: int = 300,
 ) -> list[dict]:
     """
     Divide el texto de las páginas en fragmentos más pequeños.
