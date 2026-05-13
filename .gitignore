@@ -1,0 +1,22 @@
+# PyCharm
+.idea/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment
+.venv/
+venv/
+
+# Environment variables
+.env
+
+# PDFs and generated data
+documents/
+storage/
+vector_db/
+
+# Logs
+*.log
