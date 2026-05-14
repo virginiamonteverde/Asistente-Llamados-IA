@@ -32,16 +32,18 @@ La aplicación ya permite:
 - HTML
 - CSS
 - Git / GitHub
+- Gemini API
+- google-genai
 
-## Modelos usados con Ollama
+```markdown
+## Modelos y proveedores de IA
 
-Modelo de chat:
+Actualmente la aplicación usa dos proveedores:
 
-```txt
-hermes3:8b
-```
+- **Ollama** para generar embeddings locales.
+- **Gemini** para generar las respuestas del chat.
 
-Modelo de embeddings:
+Modelo de embeddings en Ollama:
 
 ```txt
 nomic-embed-text:latest
@@ -65,7 +67,7 @@ Usuario hace una pregunta
 → Se genera el embedding de la pregunta
 → Se busca contexto relevante en ChromaDB
 → Se arma un prompt con los fragmentos encontrados
-→ Ollama genera la respuesta
+→ Gemini genera la respuesta
 → Flask muestra respuesta y fuentes en la web
 ```
 
@@ -160,6 +162,13 @@ Descargar el modelo de chat:
 ```bash
 ollama pull hermes3:8b
 ```
+
+También es necesario tener una API key de Gemini configurada como variable de entorno.
+
+En Windows PowerShell:
+
+```bash
+$env:GEMINI_API_KEY="TU_API_KEY"
 
 ## Configuración
 
@@ -276,8 +285,6 @@ Para ese tipo de preguntas será necesario agregar una lógica específica de an
 
 ## Próximas mejoras previstas
 
-- Agregar un selector de documento.
-- Permitir consultar todos los documentos o un PDF específico.
 - Mejorar la calidad visual de las respuestas con párrafos y listas.
 - Mejorar el prompt interno de RAG.
 - Agregar lógica especial para preguntas comparativas entre documentos.
