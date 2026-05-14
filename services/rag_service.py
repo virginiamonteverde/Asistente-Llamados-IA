@@ -1,4 +1,4 @@
-from services.ai_provider import OllamaProvider
+from services.ai_provider import GeminiProvider, OllamaProvider
 from services.vector_store import VectorStore
 
 
@@ -16,7 +16,8 @@ class RagService:
     """
 
     def __init__(self):
-        self.ai_provider = OllamaProvider()
+        self.embedding_provider = OllamaProvider()
+        self.chat_provider = GeminiProvider()
         self.vector_store = VectorStore()
 
     def list_documents(self) -> list[str]:
@@ -67,7 +68,7 @@ class RagService:
         Si se recibe file_name, busca únicamente dentro de ese documento.
         """
 
-        question_embedding = self.ai_provider.get_embedding(question)
+        question_embedding = self.embedding_provider.get_embedding(question)
 
         search_results = self.vector_store.search(
             query_embedding=question_embedding,
@@ -161,7 +162,7 @@ Pregunta:
 Respuesta:
 """
 
-        answer = self.ai_provider.generate_answer(prompt)
+        answer = self.chat_provider.generate_answer(prompt)
 
         sources = []
 

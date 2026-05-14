@@ -1,4 +1,7 @@
+import os
 import requests
+
+from google import genai
 
 from config import OLLAMA_BASE_URL, EMBEDDING_MODEL, CHAT_MODEL
 
@@ -56,3 +59,33 @@ class OllamaProvider:
         data = response.json()
 
         return data["response"]
+
+
+class GeminiProvider:
+    """
+    Implementación concreta para generar respuestas con Gemini.
+
+    La API key se toma desde la variable de entorno GEMINI_API_KEY.
+    No debe escribirse la clave dentro del código.
+    """
+
+    def __init__(self):
+        if not os.getenv("GEMINI_API_KEY"):
+            raise ValueError(
+                "No se encontró la variable de entorno GEMINI_API_KEY."
+            )
+
+        self.client = genai.Client()
+        self.chat_model = "gemini-2.5-flash"
+
+    def generate_answer(self, prompt: str) -> str:
+        """
+        Genera una respuesta usando Gemini.
+        """
+
+        response = self.client.models.generate_content(
+            model=self.chat_model,
+            contents=prompt,
+        )
+
+        return response.text
