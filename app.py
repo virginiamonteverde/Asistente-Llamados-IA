@@ -13,26 +13,42 @@ def index():
     answer = None
     sources = []
     error = None
+    selected_document = ""
+
+    documents = rag_service.list_documents()
 
     if request.method == "POST":
         question = request.form.get("question", "").strip()
+        selected_document = request.form.get("selected_document", "").strip()
 
-        if question:
+        if not selected_document:
+            error = "Tenés que seleccionar un documento antes de hacer una pregunta."
+
+        elif not question:
+            error = "Tenés que escribir una pregunta."
+
+        else:
             try:
-                result = rag_service.ask(question, n_results=5)
+                result = rag_service.ask(
+                    question=question,
+                    file_name=selected_document,
+                    n_results=2,
+                )
 
                 answer = result.get("answer")
                 sources = result.get("sources", [])
 
             except Exception as e:
-                error = f"Ocurrió un error al consultar los documentos: {e}"
+                error = f"Ocurrió un error al consultar el documento: {e}"
 
     return render_template(
         "index.html",
         question=question,
         answer=answer,
         sources=sources,
-        error=error
+        error=error,
+        documents=documents,
+        selected_document=selected_document,
     )
 
 

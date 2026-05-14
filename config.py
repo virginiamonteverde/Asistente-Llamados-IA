@@ -17,7 +17,7 @@ OLLAMA_BASE_URL = "http://localhost:11434"
 EMBEDDING_MODEL = "nomic-embed-text:latest"
 
 # Modelo para generar respuestas
-CHAT_MODEL = "hermes3:8b"
+CHAT_MODEL = "qwen2.5:3b"
 
 # Nombre de la colección dentro de Chroma
 CHROMA_COLLECTION_NAME = "pdf_documents"

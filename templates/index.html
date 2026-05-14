@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>AI Document Explorer</title>
+    <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 </head>
 <body>
 
@@ -67,23 +69,82 @@
                 {% endif %}
 
                 <form method="POST" class="question-form" id="questionForm">
+
+                    <div class="document-selector">
+                        <label for="selectedDocument">Documento a consultar</label>
+
+                        <select
+                            name="selected_document"
+                            id="selectedDocument"
+                            required
+                            placeholder="Buscar y seleccionar documento..."
+                        >
+                            <option value="">Buscar y seleccionar documento...</option>
+
+                            {% for document in documents %}
+                                <option
+                                    value="{{ document }}"
+                                    {% if document == selected_document %}selected{% endif %}
+                                >
+                                    {{ document }}
+                                </option>
+                            {% endfor %}
+                        </select>
+
+                        <p class="document-help">
+                            Primero elegí el PDF sobre el que querés preguntar.
+                        </p>
+                    </div>
+
                     <textarea
                         name="question"
-                        placeholder="Escribe tu pregunta sobre los documentos..."
+                        placeholder="Escribe tu pregunta sobre el documento seleccionado..."
+                        required
                     >{{ question }}</textarea>
 
                     <button type="submit" id="submitButton">
                         <span>⌁</span>
-                        Consultar documentos
+                        Consultar documento
                     </button>
 
                     <div class="loading-box" id="loadingBox">
-                        <div class="loading-text">Consultando documentos y generando respuesta...</div>
+                        <div class="loading-text">Consultando el documento y generando respuesta...</div>
                         <div class="progress-bar">
                             <div class="progress-fill"></div>
                         </div>
                     </div>
                 </form>
+
+                <script>
+                    const questionForm = document.getElementById("questionForm");
+                    const loadingBox = document.getElementById("loadingBox");
+                    const submitButton = document.getElementById("submitButton");
+
+                    new TomSelect("#selectedDocument", {
+                        create: false,
+                        allowEmptyOption: true,
+                        placeholder: "Buscar y seleccionar documento...",
+                        maxOptions: 200,
+                        sortField: {
+                            field: "text",
+                            direction: "asc"
+                        }
+                    });
+
+                    questionForm.addEventListener("submit", function (event) {
+                        const selectedDocument = document.getElementById("selectedDocument");
+
+                        if (!selectedDocument.value) {
+                            event.preventDefault();
+                            alert("Tenés que seleccionar un documento antes de preguntar.");
+                            return;
+                        }
+
+                        loadingBox.classList.add("is-visible");
+                        submitButton.disabled = true;
+                        submitButton.innerHTML = "<span>⌁</span> Consultando...";
+                    });
+                </script>
 
                 <script>
                     const questionForm = document.getElementById("questionForm");

@@ -19,6 +19,13 @@ class RagService:
         self.ai_provider = OllamaProvider()
         self.vector_store = VectorStore()
 
+    def list_documents(self) -> list[str]:
+        """
+        Devuelve la lista de documentos disponibles para consultar.
+        """
+
+        return self.vector_store.list_documents()
+
     def _score_result(self, question: str, document: str, metadata: dict) -> int:
         """
         Calcula un puntaje simple para priorizar resultados cuyo archivo o texto
@@ -48,9 +55,16 @@ class RagService:
 
         return score
 
-    def ask(self, question: str, n_results: int = 5) -> dict:
+    def ask(
+        self,
+        question: str,
+        n_results: int = 5,
+        file_name: str | None = None,
+    ) -> dict:
         """
         Recibe una pregunta del usuario y devuelve una respuesta basada en los PDFs.
+
+        Si se recibe file_name, busca únicamente dentro de ese documento.
         """
 
         question_embedding = self.ai_provider.get_embedding(question)
@@ -58,10 +72,19 @@ class RagService:
         search_results = self.vector_store.search(
             query_embedding=question_embedding,
             n_results=n_results,
+            file_name=file_name,
         )
 
         documents = search_results["documents"][0]
         metadatas = search_results["metadatas"][0]
+
+        if not documents:
+            return {
+                "question": question,
+                "selected_document": file_name,
+                "answer": "No encontré fragmentos relacionados en el documento seleccionado.",
+                "sources": [],
+            }
 
         combined_results = []
 
@@ -106,15 +129,26 @@ class RagService:
 
         context = "\n\n---\n\n".join(context_parts)
 
+        selected_document_text = ""
+
+        if file_name:
+            selected_document_text = (
+                f"\nEl usuario seleccionó específicamente el documento: {file_name}.\n"
+                "Respondé únicamente usando información de ese documento.\n"
+            )
+
         prompt = f"""
 Sos un asistente que responde preguntas usando únicamente la información de documentos PDF.
+{selected_document_text}
 
 Reglas:
 - Respondé solo con la información que aparece en el contexto.
 - Si el contexto contiene información parcial, respondé con esa información y aclaralo.
-- Solo si el contexto no contiene nada relacionado con la pregunta, decí: "No encuentro información suficiente en los documentos para responder eso."
+- Solo si el contexto no contiene nada relacionado con la pregunta, decí: "No encuentro información suficiente en el documento seleccionado para responder eso."
 - No inventes datos.
 - Respondé en español claro.
+- Separá la respuesta en párrafos breves.
+- Si corresponde, usá viñetas para que la respuesta sea más fácil de leer.
 - Cuando corresponda, mencioná de qué documento o página sale la información.
 - Si hay varias fuentes parecidas, priorizá la fuente cuyo título, nombre de archivo o contenido coincida mejor con la pregunta del usuario.
 
@@ -144,6 +178,7 @@ Respuesta:
 
         return {
             "question": question,
+            "selected_document": file_name,
             "answer": answer.strip(),
             "sources": sources,
         }
